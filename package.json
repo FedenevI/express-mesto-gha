@@ -1,0 +1,25 @@
+{
+  "name": "mesto-backend",
+  "version": "1.0.0",
+  "description": "backend project mesto",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint .",
+    "lintfix": "npx eslint . --fix"
+  },
+  "author": "Fedenev",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "nodemon": "^3.0.2"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3"
+  }
+}
