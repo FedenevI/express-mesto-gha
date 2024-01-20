@@ -13,28 +13,20 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.userId)
-    .catch((err) => res.status(400).send({ message: `ID пользователя указан в неправильном формате. Подробнее:${err.message}` }))
-    .orFail()
-    .then((user) => {
-      res.status(OK).send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({
-          message: 'Передан некорректный ID',
-        });
-      } else if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({
-          message: 'Пользователь с таким ID не найден',
-        });
-      } else {
-        res.status(500).send({
-          message: `Произошла ошибка. Подробнее: ${err.message}`,
-        });
-      }
-    });
-};
+  if (req.params.userId.length === 24) {
+    User.findById(req.params.userId)
+      .then((user) => {
+        if (!user) {
+          res.status(404).send({ message: 'Пользователь с таким ID не найден' });
+          return;
+        }
+        res.send(user);
+      })
+      .catch(() => res.status(404).send({ message: 'Пользователь с таким ID не найден' }));
+  } else {
+    res.status(400).send({ message: 'Некоррекный ID' });
+  }
+}
 
 module.exports.addUser = (req, res) => {
   const { name, about, avatar } = req.body;
