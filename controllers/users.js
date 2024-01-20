@@ -1,7 +1,7 @@
 const User = require('../models/user');
 
 const CREATED = 201;
-// const OK = 200;
+const OK = 200;
 const BAD_REQUEST = 400;
 const NOT_FOUND = 404;
 const SERVER_ERROR = 500;
@@ -14,12 +14,12 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .catch(() => res.status(BAD_REQUEST).send({ message: 'ID пользователя указан в неправильном формате' }))
+    .catch((err) => res.status(400).send({ message: `ID пользователя указан в неправильном формате. Подробнее:${err.message}` }))
     .orFail()
     .then((user) => {
-      res.send(user);
+      res.status(OK).send(user);
     })
-    .catch((err) => res.status(NOT_FOUND).send({ message: `Пользователь с таким ID не найден. Подробнее:${err.message}` }));
+    .catch((err) => res.status(404).send({ message: `Пользователь с таким ID не найден. Подробнее:${err.message}` }));
 };
 
 module.exports.addUser = (req, res) => {
