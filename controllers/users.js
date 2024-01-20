@@ -14,12 +14,9 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
+    .catch(() => res.status(BAD_REQUEST).send({ message: 'ID пользователя указан в неправильном формате' }))
     .orFail()
     .then((user) => {
-      if (!user) {
-        res.status(NOT_FOUND).send({ message: 'Пользователь с таким ID не найден' });
-        return;
-      }
       res.send(user);
     })
     .catch((err) => res.status(NOT_FOUND).send({ message: `Пользователь с таким ID не найден. Подробнее:${err.message}` }));
