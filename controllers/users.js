@@ -19,7 +19,21 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       res.status(OK).send(user);
     })
-    .catch((err) => res.status(404).send({ message: `Пользователь с таким ID не найден. Подробнее:${err.message}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({
+          message: 'Передан некорректный ID',
+        });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({
+          message: 'Пользователь с таким ID не найден',
+        });
+      } else {
+        res.status(500).send({
+          message: `Произошла ошибка. Подробнее: ${err.message}`,
+        });
+      }
+    });
 };
 
 module.exports.addUser = (req, res) => {
