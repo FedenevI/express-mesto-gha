@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 
-// const CREATED = 201;
-// const OK = 200;
+const CREATED = 201;
+const OK = 200;
 const BAD_REQUEST = 400;
 const NOT_FOUND = 404;
 const SERVER_ERROR = 500;
@@ -12,7 +12,7 @@ module.exports.addCard = (req, res) => {
     .then((card) => {
       Card.findById(card._id)
         .populate('owner')
-        .then((data) => res.send(data))
+        .then((data) => res.status(CREATED).send(data))
         .catch((err) => res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет. Подробнее:${err.message}` }));
     })
     .catch((err) => {
@@ -32,54 +32,57 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  if (req.params.cardId.length === 24) {
-    Card.findByIdAndDelete(req.params.cardId)
-      .orFail()
-      .then((card) => {
-        if (!card) {
-          res.status(NOT_FOUND).send({ message: 'Карточки с таким ID нет' });
-          return;
-        }
-        res.send({ message: 'Карточка удалена' });
-      })
-      .catch((err) => res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет. Подробнее:${err.message}` }));
-  } else {
-    res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
-  }
+  Card.findByIdAndDelete(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: 'Карточки с таким ID нет' });
+        return;
+      }
+      res.send({ message: 'Карточка удалена' });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
+      } else {
+        res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет.Подробнее: ${err.message} ` });
+      }
+    });
 };
 
 module.exports.likeCard = (req, res) => {
-  if (req.params.cardId.length === 24) {
-    Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-      .populate(['owner', 'likes'])
-      .orFail()
-      .then((card) => {
-        if (!card) {
-          res.status(NOT_FOUND).send({ message: 'Карточки с таким ID нет' });
-          return;
-        }
-        res.send(card);
-      })
-      .catch((err) => res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет. Подробнее:${err.message}` }));
-  } else {
-    res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
-  }
+  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    .populate(['owner', 'likes'])
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: 'Карточки с таким ID нет' });
+        return;
+      }
+      res.status(OK).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
+      } else {
+        res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет.Подробнее: ${err.message}` });
+      }
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
-  if (req.params.cardId.length === 24) {
-    Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-      .populate(['owner', 'likes'])
-      .orFail()
-      .then((card) => {
-        if (!card) {
-          res.status(NOT_FOUND).send({ message: 'Карточки с таким ID нет' });
-          return;
-        }
-        res.send(card);
-      })
-      .catch((err) => res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет. Подробнее:${err.message}` }));
-  } else {
-    res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
-  }
+  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+    .populate(['owner', 'likes'])
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: 'Карточки с таким ID нет' });
+        return;
+      }
+      res.status(OK).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
+        return;
+      }
+      res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет.Подробнее: ${err.message}` });
+    });
 };
