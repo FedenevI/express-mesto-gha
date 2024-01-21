@@ -43,8 +43,10 @@ module.exports.deleteCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
+      } else if (err.name === 'ServerError') {
+        res.status(SERVER_ERROR).send({ message: `Ошибка сервера при удалении карточки. Подробнее: ${err.message}` });
       } else {
-        res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет.Подробнее: ${err.message} ` });
+        res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет. Подробнее: ${err.message}` });
       }
     });
 };
@@ -63,7 +65,7 @@ module.exports.likeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
       } else {
-        res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет.Подробнее: ${err.message}` });
+        res.status(SERVER_ERROR).send({ message: `Ошибка сервера. Подробнее: ${err.message}` });
       }
     });
 };
@@ -83,6 +85,6 @@ module.exports.dislikeCard = (req, res) => {
         res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
         return;
       }
-      res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет.Подробнее: ${err.message}` });
+      res.status(SERVER_ERROR).send({ message: `Ошибка сервера.Подробнее: ${err.message}` });
     });
 };

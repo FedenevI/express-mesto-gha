@@ -51,8 +51,10 @@ module.exports.editUserData = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: err.message });
-      } else {
+      } else if (err.name === 'CastError') {
         res.status(NOT_FOUND).send({ message: `Пользователь по указанному ID не найден.Подробнее:${err.message}` });
+      } else {
+        res.status(SERVER_ERROR).send({ message: `На сервере произошла ошибка.Подробнее:${err.message}` });
       }
     });
 };
@@ -64,8 +66,10 @@ module.exports.editUserAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: err.message });
+      } else if (err.name === 'CastError') {
+        res.status(NOT_FOUND).send({ message: `Некоррекный ID.Подробнее:${err.message}` });
       } else {
-        res.status(NOT_FOUND).send({ message: `Пользователь по указанному ID не нйден.Подробнее:${err.message}` });
+        res.status(SERVER_ERROR).send({ message: `На сервере произошла ошибка.Подробнее:${err.message}` });
       }
     });
 };
