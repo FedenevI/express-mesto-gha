@@ -13,7 +13,7 @@ module.exports.addCard = (req, res) => {
       Card.findById(card._id)
         .populate('owner')
         .then((data) => res.status(CREATED).send(data))
-        .catch((err) => res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет. Подробнее:${err.message}` }));
+        .catch((err) => res.status(SERVER_ERROR).send({ message: `Ошибка на стороне сервера: ${err.message}` }));
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -43,10 +43,8 @@ module.exports.deleteCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Некорректный ID карты' });
-      } else if (err.name === 'ServerError') {
-        res.status(SERVER_ERROR).send({ message: `Ошибка сервера при удалении карточки. Подробнее: ${err.message}` });
       } else {
-        res.status(NOT_FOUND).send({ message: `Карточки с таким ID нет. Подробнее: ${err.message}` });
+        res.status(SERVER_ERROR).send({ message: `Ошибка сервера при удалении карточки.Подробнее: ${err.message}` });
       }
     });
 };
