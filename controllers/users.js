@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFounderError = require('../errors/NotFoundError');
 
 const CREATED = 201;
 const OK = 200;
@@ -12,20 +14,21 @@ module.exports.getUsers = (req, res) => {
     .catch((err) => res.status(SERVER_ERROR).send({ message: `На сервере произошла ошибка. Подробнее:${err.message}` }));
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND).send({ message: 'Пользователь с таким ID не найден' });
+        res.status(NotFounderError).send({ message: 'Пользователь с таким ID не найден' });
         return;
       }
       res.status(OK).send(user);
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Некоррекный ID' });
+        res.status(BadRequestError).send({ message: 'Некоррекный ID' });
       } else {
-        res.status(SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        next(error);
+        // res.status(SERVER_ERROR).send({ message: 'Ошибка сервера' });
       }
     });
 };
