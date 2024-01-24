@@ -12,13 +12,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect(DB_URL);
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '65afdc54dabcc1bbe814a17f',
-  };
-  next();
-});
-
 app.use('/', require('./routes/index'));
 
 app.use('*', (req, res) => {
