@@ -16,7 +16,7 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(helmet());
 
-const NOT_FOUND = 404;
+// const NOT_FOUND = 404;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
