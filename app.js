@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+const NotFounderError = require('./errors/NotFoundError');
 
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
@@ -26,6 +27,10 @@ app.use('/', require('./routes/index'));
 
 app.use('*', (req, res) => {
   res.status(NOT_FOUND).send({ message: 'Страницы не существует' });
+});
+
+app.use((req, res, next) => {
+  next(new NotFounderError('Страницы не существует'));
 });
 
 app.use(errors());
